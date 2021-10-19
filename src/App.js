@@ -27,6 +27,7 @@ const App = () => {
       }
     }
     Hub.listen('auth', (data) => {
+      console.log(data)
       switch (data.payload.event) {
         case 'signIn':
           console.log('user signed in')
@@ -209,6 +210,9 @@ const App = () => {
           <button
             onClick={() => Auth.federatedSignIn({ provider: 'Facebook' })}>
             facebook
+          </button>
+          <button onClick={() => Auth.federatedSignIn({ provider: 'Google' })}>
+            Google
           </button>
         </div>
       )}
