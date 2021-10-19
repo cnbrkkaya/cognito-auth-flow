@@ -1,0 +1,17 @@
+{
+  "trigger": true,
+  "modules": [
+    "custom"
+  ],
+  "parentResource": "cognitoauthflow85e12f4f",
+  "functionName": "cognitoauthflow85e12f4fPreSignup",
+  "resourceName": "cognitoauthflow85e12f4fPreSignup",
+  "parentStack": "auth",
+  "triggerEnvs": [],
+  "triggerDir": "C:\\Users\\canberk\\AppData\\Roaming\\npm\\node_modules\\@aws-amplify\\cli\\node_modules\\amplify-category-auth\\provider-utils\\awscloudformation\\triggers\\PreSignup",
+  "triggerTemplate": "PreSignup.json.ejs",
+  "triggerEventPath": "PreSignup.event.json",
+  "roleName": "cognitoauthflow85e12f4fPreSignup",
+  "skipEdit": true,
+  "enableCors": false
+}

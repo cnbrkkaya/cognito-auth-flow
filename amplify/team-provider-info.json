@@ -13,7 +13,16 @@
     },
     "categories": {
       "auth": {
-        "cognitoauthflow85e12f4f": {}
+        "cognitoauthflow85e12f4f": {
+          "facebookAppId": "289102059742702",
+          "googleClientId": "1001413630162-oks368dfujbu985e3eb1v53jc3gpr4gs.apps.googleusercontent.com"
+        }
+      },
+      "function": {
+        "cognitoauthflow85e12f4fPreSignup": {
+          "deploymentBucketName": "amplify-cognitoauthflow-dev-153324-deployment",
+          "s3Key": "amplify-builds/cognitoauthflow85e12f4fPreSignup-486f634e413538634878-build.zip"
+        }
       }
     }
   }

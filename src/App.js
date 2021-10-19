@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Auth, Hub } from 'aws-amplify'
+import Amplify from 'aws-amplify'
+import awsExports from './aws-exports'
+Amplify.configure(awsExports)
 
 const initialFormState = {
   email: '',
@@ -15,6 +18,7 @@ const App = () => {
 
   useEffect(() => {
     async function checkUser() {
+      console.log('naber')
       try {
         const user = await Auth.currentAuthenticatedUser()
 
@@ -30,11 +34,11 @@ const App = () => {
       console.log(data)
       switch (data.payload.event) {
         case 'signIn':
-          console.log('user signed in')
+          // console.log('user signed in')
           checkUser()
           break
         case 'signUp':
-          console.log('user signed up')
+          // console.log('user signed up')
           checkUser()
           break
         case 'signOut':
@@ -45,20 +49,26 @@ const App = () => {
           checkUser()
           break
         case 'cognitoHostedUI_failure':
-          console.log('Sign in failure', data)
+          // console.log('Sign in failure', data)
           break
         case 'signIn_failure':
-          console.log('user sign in failed')
+          // console.log('user sign in failed')
+          break
+        case 'signUp_failure':
+          // console.log('user sign in failed')
+          break
+        case 'customState_failure':
+          // console.log('customState_failure')
           break
         case 'configured':
-          console.log('the Auth module is configured')
+          // console.log('the Auth module is configured')
           break
         default:
           break
       }
     })
 
-    checkUser()
+    // checkUser()
   }, [])
 
   const onChange = (e) => {
@@ -141,6 +151,15 @@ const App = () => {
       setErrorMessage(e.message)
     }
   }
+
+  function facebookLogin() {
+    Auth.federatedSignIn({ provider: 'Facebook' })
+      .then(
+        (data) => console.log(data),
+        (error) => console.log(error)
+      )
+      .catch((error) => console.log(error))
+  }
   return (
     <div>
       {formType === 'signUp' && (
@@ -207,10 +226,7 @@ const App = () => {
             Sign Up
           </button>
 
-          <button
-            onClick={() => Auth.federatedSignIn({ provider: 'Facebook' })}>
-            facebook
-          </button>
+          <button onClick={(event) => facebookLogin(event)}>facebook</button>
           <button onClick={() => Auth.federatedSignIn({ provider: 'Google' })}>
             Google
           </button>

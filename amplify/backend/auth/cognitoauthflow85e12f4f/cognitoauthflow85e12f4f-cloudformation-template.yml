@@ -10,6 +10,18 @@ Parameters:
     Type: String
 
   
+  
+  
+  functioncognitoauthflow85e12f4fPreSignupArn:
+    Type: String
+    Default: functioncognitoauthflow85e12f4fPreSignupArn
+  
+  functioncognitoauthflow85e12f4fPreSignupName:
+    Type: String
+    Default: functioncognitoauthflow85e12f4fPreSignupName
+  
+  
+  
 
     
   identityPoolName:
@@ -162,11 +174,51 @@ Parameters:
     Type: String
   
             
+  
+  thirdPartyAuth:
+    Type: String
+            
+  facebookAppId:
+    Type: String
+  
+            
+  googleClientId:
+    Type: String
+  
+            
+  
+  userPoolGroups:
+    Type: String
+            
+  
+  adminQueries:
+    Type: String
+            
+  triggers:
+    Type: String
+  
+            
   oAuthMetadata:
     Type: String
   
             
             
+      
+  parentStack:
+    Type: String
+        
+  authTriggerConnections:
+    Type: String
+  
+            
+  
+  breakCircularDependency:
+    Type: String
+            
+        
+  permissions:
+    Type: CommaDelimitedList
+      
 Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
   
@@ -775,6 +827,16 @@ Resources:
             - cognito-idp.${region}.amazonaws.com/${client}
             - { region: !Ref "AWS::Region",  client: !Ref UserPool}
             
+      SupportedLoginProviders:
+        
+        graph.facebook.com: !Ref facebookAppId
+        
+        
+        accounts.google.com: !Ref googleClientId
+        
+        
+        
+      
       AllowUnauthenticatedIdentities: !Ref allowUnauthenticatedIdentities
       
     
@@ -829,8 +891,14 @@ Outputs :
     Condition: ShouldOutputAppClientSecrets
   
   
+  GoogleWebClient:
+    Value: !Ref googleClientId
   
   
+  
+  
+  FacebookWebClient:
+    Value: !Ref facebookAppId
   
   
   

@@ -3,7 +3,17 @@
     "cognitoauthflow85e12f4f": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "cognitoauthflow85e12f4fPreSignup",
+          "triggerProvider": "Cognito",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        }
+      ],
       "customAuth": false,
       "frontendAuthConfig": {
         "loginMechanisms": [
@@ -24,6 +34,13 @@
           "EMAIL"
         ]
       }
+    }
+  },
+  "function": {
+    "cognitoauthflow85e12f4fPreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   }
 }
