@@ -1,63 +1,64 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { Auth, Hub } from 'aws-amplify'
 import { UserContext } from '../contexts/UserContext'
-import App from '../App'
+import Error from './components/Error/Error'
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
-const Authenticator = (props) => {
-  const { user, setUser, checkUser } = useContext(UserContext)
-  console.log(user)
+const Authenticator = () => {
+  const { setUser, checkUser } = useContext(UserContext)
   const initialFormState = {
     email: '',
     password: '',
     authCode: '',
-    formType: user ? 'signedIn' : 'signIn',
+    formType: 'signIn',
+    //user ? 'signedIn' :
   }
-  console.log(initialFormState)
+
   const [formState, updateFormState] = useState(initialFormState)
   const [errorMessage, setErrorMessage] = useState(null)
 
-  useEffect(() => {
-    checkUser()
-    Hub.listen('auth', (data) => {
-      console.log(data)
-      switch (data.payload.event) {
-        case 'signIn':
-          // console.log('user signed in')
-          checkUser()
-          break
-        case 'signUp':
-          // console.log('user signed up')
-          checkUser()
-          break
-        case 'signOut':
-          updateFormState((prevState) => ({ ...prevState, formType: 'signIn' }))
-          setUser(null)
-          break
-        case 'cognitoHostedUI':
-          checkUser()
-          break
-        case 'cognitoHostedUI_failure':
-          // console.log('Sign in failure', data)
-          break
-        case 'signIn_failure':
-          // console.log('user sign in failed')
-          break
-        case 'signUp_failure':
-          // console.log('user sign in failed')
-          break
-        case 'customState_failure':
-          // console.log('customState_failure')
-          break
-        case 'configured':
-          // console.log('the Auth module is configured')
-          break
-        default:
-          break
-      }
-    })
-    return () => Hub.remove('auth')
-    // checkUser()
-  }, [])
+  Hub.listen('auth', (data) => {
+    switch (data.payload.event) {
+      case 'signIn':
+        // console.log('user signed in')
+        checkUser()
+        break
+      case 'signUp':
+        // console.log('user signed up')
+        checkUser()
+        break
+      case 'signOut':
+        updateFormState((prevState) => ({ ...prevState, formType: 'signIn' }))
+        setUser(null)
+        break
+      case 'cognitoHostedUI':
+        checkUser()
+        break
+      case 'cognitoHostedUI_failure':
+        console.log('hosted UI')
+        setErrorMessage(data.payload.data.message)
+        break
+      case 'signIn_failure':
+        // console.log('user sign in failed')
+        break
+      case 'signUp_failure':
+        console.log('hosted UI')
+        console.log(data)
+        break
+      case 'customState_failure':
+        console.log('hosted UI')
+        console.log(data)
+        break
+      case 'configured':
+        // console.log('the Auth module is configured')
+        break
+      default:
+        break
+    }
+  })
+  // useEffect(() => {
+  //   return () => Hub.remove('auth')
+  // }, [])
 
   const onChange = (e) => {
     e.persist()
@@ -96,8 +97,7 @@ const Authenticator = (props) => {
   }
   async function signIn() {
     const { email, password } = formState
-    console.log(email)
-    console.log(password)
+
     try {
       await Auth.signIn(email, password)
       const tempUser = await Auth.currentAuthenticatedUser()
@@ -110,46 +110,33 @@ const Authenticator = (props) => {
     }
   }
 
-  async function forgotPassword() {
-    const { email } = formState
-    try {
-      await Auth.forgotPassword(email)
-      updateFormState(() => ({
-        ...formState,
-        email,
-        formType: 'completeForgotPassword',
-      }))
-      setErrorMessage(null)
-    } catch (e) {
-      console.log(e)
-      setErrorMessage(e.message)
-    }
-  }
-  async function completeForgotPassword() {
-    const { email, authCode, password } = formState
-    try {
-      await Auth.forgotPasswordSubmit(email, authCode, password)
-      updateFormState(() => ({
-        ...formState,
-        formType: 'signIn',
-      }))
-      setErrorMessage(null)
-    } catch (e) {
-      console.log(e)
-      setErrorMessage(e.message)
-    }
-  }
-
-  function facebookLogin() {
-    Auth.federatedSignIn({ provider: 'Facebook' })
-      .then(
-        (data) => console.log(data),
-        (error) => console.log(error)
-      )
-      .catch((error) => console.log(error))
-  }
   return (
     <div>
+      <Router>
+        <div>
+          <nav>
+            <ul>
+              <li>
+                <Link to='/'>Home</Link>
+              </li>
+              <li>
+                <Link to='/admin'>Admin Login</Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+          <Switch>
+            <Route path='/admin'>
+              <AdminLogin />
+            </Route>
+            <Route path='/'>
+              <Home />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
       {formType === 'signUp' && (
         <div>
           <input
@@ -214,20 +201,56 @@ const Authenticator = (props) => {
             Sign Up
           </button>
 
-          <button onClick={(event) => facebookLogin(event)}>facebook</button>
+          <button
+            onClick={() => Auth.federatedSignIn({ provider: 'Facebook' })}>
+            facebook
+          </button>
           <button onClick={() => Auth.federatedSignIn({ provider: 'Google' })}>
             Google
           </button>
         </div>
       )}
       {/* {user && props.children} */}
-      {errorMessage !== null ? (
-        <div className='auth-err-message'>
-          <p>{errorMessage}</p>
-        </div>
-      ) : null}
+      {errorMessage !== null && <Error message={errorMessage} />}
     </div>
   )
 }
 
 export default Authenticator
+
+// async function forgotPassword() {
+//   const { email } = formState
+//   try {
+//     await Auth.forgotPassword(email)
+//     updateFormState(() => ({
+//       ...formState,
+//       email,
+//       formType: 'completeForgotPassword',
+//     }))
+//     setErrorMessage(null)
+//   } catch (e) {
+//     console.log(e)
+//     setErrorMessage(e.message)
+//   }
+// }
+// async function completeForgotPassword() {
+//   const { email, authCode, password } = formState
+//   try {
+//     await Auth.forgotPasswordSubmit(email, authCode, password)
+//     updateFormState(() => ({
+//       ...formState,
+//       formType: 'signIn',
+//     }))
+//     setErrorMessage(null)
+//   } catch (e) {
+//     console.log(e)
+//     setErrorMessage(e.message)
+//   }
+// }
+function Home() {
+  return <h2>Home</h2>
+}
+
+function AdminLogin() {
+  return <h2>Admin Login</h2>
+}

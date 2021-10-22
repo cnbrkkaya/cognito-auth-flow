@@ -1,7 +1,67 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { Auth } from 'aws-amplify'
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
 const InnerApp = () => {
-  return <div>Inner App</div>
+  function signOut() {
+    Auth.signOut()
+      .then((data) => console.log(data))
+      .catch((err) => console.log(err))
+  }
+
+  useEffect(() => {
+    const { attributes } = Auth.currentAuthenticatedUser().then((data) =>
+      console.log(data)
+    )
+  }, [])
+  return (
+    <div>
+      Inner App <button onClick={signOut}>OUT</button>
+      <Router>
+        <div>
+          <nav>
+            <ul>
+              <li>
+                <Link to='/'>Home</Link>
+              </li>
+              <li>
+                <Link to='/about'>About</Link>
+              </li>
+              <li>
+                <Link to='/users'>Users</Link>
+              </li>
+            </ul>
+          </nav>
+
+          {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+          <Switch>
+            <Route path='/about'>
+              <About />
+            </Route>
+            <Route path='/users'>
+              <Users />
+            </Route>
+            <Route path='/'>
+              <Home />
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+    </div>
+  )
 }
 
 export default InnerApp
+
+function Home() {
+  return <h2>Home</h2>
+}
+
+function About() {
+  return <h2>About</h2>
+}
+
+function Users() {
+  return <h2>Users</h2>
+}
